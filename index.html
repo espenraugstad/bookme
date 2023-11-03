@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avtal time</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        width: 90%;
+        margin: 0 auto;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .ident {
+        display: grid;
+        grid-template-columns: 50px 200px;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .ident>label{
+        justify-self: end;
+      }
+
+      .ident>input{
+        justify-self: start;
+      }
+
+      .tid {
+        display: flex;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid black;
+        min-width: 250px;
+      }
+      .date {
+        display: flex;
+        flex-direction: column;
+        margin-right: 1rem;
+      }
+      .date > span {
+        font-weight: 900;
+      }
+
+      .clock {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+      }
+
+      .select {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Finn en tid å treffe meg</h1>
+      <p>
+        Her kan du velge et tidspunkt hvor jeg er ledig. Hvert tidspunkt går 1
+        time frem i tid. Det er mulig å velge flere tidspunkt samtidig.
+      </p>
+      <h3>Hvem er du og hvor vil du møtes?</h3>
+      <div class="ident">       
+          <label for="navn">Navn: </label>
+          <input id="navn" type="text" />      
+          <label for="sted">Sted:</label>
+          <input id="sted" type="text" />
+      </div>
+      <h3>Når vil du møtes?</h3>
+      <div id="tider"></div>
+      <button id="send">Send</button>
+    </main>
+  </body>
+  <script type="module">
+    import { times } from "./times.js";
+
+    const tider = document.getElementById("tider");
+    const send = document.getElementById('send');
+
+    const days = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Des",
+    ];
+
+    send.addEventListener("click", ()=>{
+        // Select all selected checkboxes
+        const selectedTimes = document.querySelectorAll("input[type=checkbox]:checked");
+        if(selectedTimes.length === 0){
+            alert("Du har ikke valgt noen tidspunkt");
+            return;
+        }
+        // Get the name and place
+        const name = document.getElementById("navn").value;
+        if(name === ""){
+            alert("Hvem er du?");
+            return;
+        }
+
+        const place = document.getElementById("sted").value;
+        if(place === ""){
+            alert("Hvor vil du møtes?");
+            return;
+        }
+
+        // Get actual times from selected times
+        const dates = [];
+        selectedTimes.forEach((t) => {
+          dates.push(times[t.value]);
+        });
+        
+
+        console.log(name);
+        console.log(place);
+        console.log(dates);
+        
+
+    });
+
+    console.log(times);
+    for (const [index, time] of times.entries()) {
+      const div = document.createElement("div");
+      div.classList.add("tid");
+      div.innerHTML = `
+        <div class="date">
+        <span>${days[time.dateStart.getDay() - 1]}</span>
+        ${time.dateStart.getDate()}. ${
+        months[time.dateStart.getMonth()]
+      } ${time.dateStart.getFullYear()}
+        </div>
+        <div class="clock">
+            ${
+              time.dateStart.getHours() < 10
+                ? "0" + time.dateStart.getHours()
+                : time.dateStart.getHours()
+            }:${
+        time.dateStart.getMinutes() < 10
+          ? "0" + time.dateStart.getMinutes()
+          : time.dateStart.getMinutes()
+      }
+        </div>
+        <div class="select">
+            <input type="checkbox" value=${index}>
+        </div>
+        `;
+      tider.appendChild(div);
+    }
+  </script>
+</html>
